@@ -1,0 +1,696 @@
+\documentclass[a4paper,11pt]{jlreq}
+
+\usepackage[haranoaji]{luatexja-preset}
+\usepackage[margin=22truemm,headheight=19pt]{geometry}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{lastpage}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{needspace}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!70!black]{hyperref}
+
+\setlength{\headheight}{19pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Git / GitHub 入門}
+\fancyhead[R]{\thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\DefineVerbatimEnvironment{codeblock}{Verbatim}{
+  fontsize=\small,
+  frame=single,
+  samepage=true,
+  xleftmargin=1.5em,
+  xrightmargin=1.5em
+}
+
+\newcommand{\cmd}[1]{\texttt{#1}}
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\warning}[1]{\par\smallskip\noindent\fcolorbox{red!60!black}{red!4}{%
+  \parbox{0.92\linewidth}{\textbf{注意}\quad #1}}\par\smallskip}
+
+\title{Git / GitHub 入門\\
+  \large 履歴を残し、共有するための最初の一歩}
+\author{kska6}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section*{この勉強会のゴール}
+
+この資料は、Git と GitHub を初めて使う人のための入門教材です。終了時には、次のことができる状態を目指します。
+
+\begin{enumerate}
+  \item Git と GitHub の違いと、それぞれの役割を説明できる
+  \item 自分の PC に Git と GitHub CLI を導入し、初期設定と認証ができる
+  \item ファイルの変更をコミットとして記録し、履歴の確認、ブランチでの作業、GitHub への共有ができる
+\end{enumerate}
+
+コマンドの暗記よりも、「いま、どこからどこへ変更を動かしているか」を意識してください。
+
+\section{Gitとはなにか}
+
+Git は、ファイルの変更履歴を記録する\term{バージョン管理システム}です。プログラムだけでなく、文章、設定ファイル、LaTeX 原稿など、テキストを中心としたファイルを管理できます。
+
+履歴は自分の PC に保存されるため、インターネットに接続していなくても記録や確認ができます。
+
+\subsection{バージョン管理とは}
+
+バージョン管理は、ファイルの内容に加えて、\term{いつ、誰が、何を、なぜ変更したか}を履歴として残す仕組みです。
+
+\begin{itemize}
+  \item 作業内容の変更履歴を確認できる
+  \item 過去の状態と現在の状態を比較できる
+  \item 間違えた変更を取り消し、過去の状態を取り戻せる
+  \item 複数の作業を分けて進め、あとで統合できる
+\end{itemize}
+
+Git はコミット時点のファイル構成を\term{スナップショット}として扱います。このスナップショットに作成者、日時、変更理由を表すメッセージなどを加えた確定記録が\term{コミット}です。作業の節目をコミットにすると、過去との差分や変更理由を、記憶ではなく履歴から確認できます。
+
+\subsection{ディレクトリコピーによる管理との違い}
+
+次のようなコピーも、簡単なバックアップとしては役立ちます。
+
+\begin{codeblock}
+report/
+report_20260719/
+report_final/
+report_final2/
+report_really_final/
+\end{codeblock}
+
+しかし、ファイル名だけでは変更内容や保存理由が分かりません。コピーが増えるほど、最新版も見分けにくくなります。\footnote{Git はバックアップそのものではありません。PC が故障するとローカルの履歴も失う可能性があります。GitHub など別の場所にも履歴を送ることで、共有と保全に役立ちます。}
+
+\term{差分}とは、二つの状態を比べたときに追加、削除、変更された行の内容を指します。
+
+\begin{table}[htbp]
+\centering
+\begin{tabularx}{\linewidth}{@{}p{0.22\linewidth}XX@{}}
+\toprule
+ & ディレクトリコピー & Git \\
+\midrule
+変更点 & 自分で比較する & 差分として確認できる \\
+変更理由 & 名前や別メモに残す & コミットメッセージに残す \\
+過去の版 & コピー単位で残す & コミット単位でたどる \\
+並行作業 & コピーが増えやすい & ブランチで分けられる \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Gitのメリットとデメリット}
+
+Git の主なメリットは次のとおりです。
+
+\begin{itemize}
+  \item 変更履歴と差分を確認できるため、いつ、どこを変更したかをたどりやすい
+  \item 履歴をローカルに保存するため、インターネットに接続していなくても高速に操作できる
+  \item 元の履歴を保ったまま作業用の履歴を分けて進められる
+  \item GitHub など、目的に合ったサービスやサーバーを共有先として選べる
+\end{itemize}
+
+一方で、次のようなデメリットや注意点があります。
+
+\begin{itemize}
+  \item 用語と基本操作を覚える必要があり、使い始めは現在の状態を把握しにくい
+  \item 取り消す対象を間違えると、必要な変更を失うことがある
+  \item 複数人が同じ場所を同時に編集すると、残す変更内容を調整する必要がある
+  \item 大きなバイナリファイルを頻繁に更新する用途では、容量管理に工夫が必要になる
+\end{itemize}
+
+\section{GitとGitHubの違い}
+
+Git と GitHub は同じものではありません。
+
+\begin{itemize}
+  \item \term{Git}: PC 内でファイルの変更履歴を作成・管理するバージョン管理システム
+  \item \term{GitHub}: Git のリポジトリをネットワーク上で保管し、共有やレビューの機能を提供するサービス
+\end{itemize}
+
+\Needspace{11\baselineskip}
+Git の履歴やファイルの状態は目に見えにくいため、この資料では随所でストップモーション制作\footnote{ストップモーションは、人形などの対象を少しずつ動かして一コマずつ撮影し、連続して再生することで動いているように見せるアニメーション技法です。粘土製の人形を使うものはクレイアニメーションとも呼ばれます。\href{https://www.pingu.jp/about/}{ピングー公式サイト}によると、\term{ピングー（Pingu）}は1980年に原型のテストフィルムが制作されたストップモーション作品です。}にたとえます。作業中のファイルを撮影セット、コミットを記録済みのコマ、コミット履歴をコマが順に並ぶストップモーション動画として考えます。これは内部構造を厳密に表すものではなく、操作の流れをつかむための例えです。
+
+この資料では、人形や小道具を少しずつ動かして撮ったコマをつなぎ、手元でストップモーション動画とその素材を管理する仕組みを Git、動画と素材をオンラインで共有し、相談やレビューを行う場所を GitHub と考えます。
+
+\begin{center}
+手元の動画と素材 $\xrightarrow{\texttt{git push}}$
+オンラインで共有・レビュー
+\end{center}
+
+\subsection{リモートリポジトリの選択肢}
+
+手元のリポジトリから参照する、ネットワーク上や別ディレクトリのリポジトリを\term{リモートリポジトリ}と呼びます。GitHub は代表的な選択肢ですが、唯一ではありません。
+
+\begin{itemize}
+  \item 別のローカルディレクトリや共有サーバー上の Git リポジトリ
+  \item GitHub
+  \item GitLab などのホスティングサービス
+  \item 組織が自分で運用するセルフホスト環境
+\end{itemize}
+
+Git とリモートの基本操作は共通ですが、アカウント、権限、課題管理、レビューなどの機能や名称はサービスごとに異なります。ストップモーションでいえば、リモートリポジトリは共有先に置いた動画とその素材、GitHub はそれらを基に相談やレビューもできる共同制作場所です。
+
+\section{手元環境への導入}
+
+\subsection{Gitをインストールする}
+
+授業や組織の指定がある場合は、そちらを優先します。インストール後はバージョンを確認します。
+
+\begin{codeblock}
+git --version
+\end{codeblock}
+
+代表的な導入方法は次のとおりです。
+
+\begin{itemize}
+  \item Windows: Git for Windows のインストーラー、または \cmd{winget install --id Git.Git -e --source winget}
+  \item macOS: Xcode Command Line Tools、Git公式インストーラー、または Homebrew の \cmd{brew install git}
+  \item Debian / Ubuntu: \cmd{sudo apt install git}
+  \item Fedora: \cmd{sudo dnf install git}
+\end{itemize}
+
+公式の導入案内は \url{https://git-scm.com/downloads} から確認できます。
+
+\subsection{Gitの初期設定}
+
+コミットに記録する名前とメールアドレスを設定します。GitHub で使う場合は、GitHub アカウントで確認済みのメールアドレス、または GitHub の no-reply アドレスを使います。
+
+\begin{codeblock}
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main
+\end{codeblock}
+
+設定を確認します。
+
+\begin{codeblock}
+git config --global --list
+\end{codeblock}
+
+\warning{名前とメールアドレスはコミット履歴に記録されます。公開リポジトリへ送る可能性がある場合は、公開してよい情報か確認してください。}
+
+\subsection{GitHub CLIをインストールする}
+
+GitHub CLI は、ターミナルから GitHub を操作する \cmd{gh} コマンドです。\url{https://cli.github.com/} の手順で導入し、バージョンを確認します。
+
+\begin{codeblock}
+gh --version
+\end{codeblock}
+
+\section{Gitのローカル環境}
+
+Git で管理するファイルには、主に次の3つの状態があります。
+
+\begin{itemize}
+  \item \term{変更済み（modified）}: 前回のコミットから内容を変更したが、まだ次のコミットには含めていない
+  \item \term{ステージ済み（staged）}: 次のコミットへ含める内容を選び、スナップショットを準備した
+  \item \term{コミット済み（committed）}: スナップショットをローカルリポジトリへ記録した
+\end{itemize}
+
+この3つの状態を扱うために、次の3つの領域を意識します。
+
+\begin{enumerate}
+  \item \term{ワークツリー}: 利用者がファイルを開いて編集するディレクトリと、その未コミットの内容
+  \item \term{インデックス（ステージングエリア）}: 次のコミットへ含める内容の情報を保持する領域
+  \item \term{ローカルリポジトリ}: PC 内の \cmd{.git} に保存されたコミットと参照の集合
+\end{enumerate}
+
+\begin{center}
+ワークツリー $\xrightarrow{\texttt{git add}}$ インデックス
+$\xrightarrow{\texttt{git commit}}$ ローカルリポジトリ
+\end{center}
+
+\term{ステージ}とは、\cmd{git add} で指定内容のスナップショットをインデックスへ記録する操作です。\cmd{git commit} は、インデックスの内容から新しいコミットを作成します。
+
+この流れは、ストップモーションの一コマを次の順で記録する作業に似ています。
+
+\begin{itemize}
+  \item 撮影セット上で、人形や小道具の配置を変更する
+  \item 残したい配置になった時点で写真を撮る
+  \item 撮影した写真へ日時とメモを付け、動画のタイムラインへ追加する
+\end{itemize}
+
+このとき、ワークツリーは撮影セット、\cmd{git add} は写真を撮る操作、インデックスは動画へ追加する前の写真に当たります。\cmd{git commit} は、その写真に作成者、日時、変更理由、直前のコミットとのつながりを加えて、ローカルリポジトリという手元の動画へ収める操作です。
+
+\begin{center}
+撮影セット $\xrightarrow{\texttt{git add}}$ 撮影済みの次のコマ
+$\xrightarrow{\texttt{git commit}}$ 手元のストップモーション動画
+\end{center}
+
+撮影後に配置を変えても写真が変わらないように、\cmd{git add} 後の編集はインデックスへ自動反映されません。反映するには、もう一度 \cmd{git add} します。なお、実際のインデックスは画像置き場ではなく、次のコミットを構成するファイル内容を保持する Git 固有の領域です。
+
+\section{【実践】リポジトリを作る}
+
+\subsection{練習用ディレクトリを用意する}
+
+任意の作業場所で次を実行します。以降は \cmd{git-practice} 内で作業します。
+
+\begin{codeblock}
+mkdir git-practice
+cd git-practice
+git init -b main
+git status
+\end{codeblock}
+
+\cmd{git init} は現在のディレクトリを Git リポジトリにします。\cmd{-b main} は最初のブランチ名を \cmd{main} にします。
+
+\subsection{イニシャルコミットを作る}
+
+まだファイルがなくても、\cmd{--allow-empty} を付けると空のコミットを作れます。
+
+\begin{codeblock}
+git commit --allow-empty -m "Initial commit"
+git log --oneline
+\end{codeblock}
+
+\cmd{-m} の後ろには、何をしたコミットかを短く書きます。この最初のコミットが履歴の出発点になります。
+
+\subsection{README.mdを作る}
+
+\cmd{README.md} は、リポジトリの目的、使い方、必要な環境を伝える案内文です。エディタで作成し、次の内容を保存します。
+
+\begin{codeblock}
+# Git practice
+
+Git and GitHub practice repository.
+\end{codeblock}
+
+\subsection{.gitignoreを作る}
+
+OS やエディタの自動生成ファイル、ビルド結果、ログなど、履歴に不要なファイルもあります。\cmd{.gitignore} にパターンを書くと、通常の追跡対象から除外できます。
+
+エディタで \cmd{.gitignore} を作り、練習用として次の内容を保存します。
+
+\begin{codeblock}
+.DS_Store
+*.log
+build/
+\end{codeblock}
+
+実際のプロジェクトでは、OS、言語、ツールに合わせて内容を決めます。GitHub のテンプレート集 \url{https://github.com/github/gitignore} も参考になりますが、各行の意味を確認して選びます。
+
+\section{【実践】直線的なコミットを作る}
+
+\subsection{変更を確認してコミットする}
+
+先ほど作成した \cmd{README.md} と \cmd{.gitignore} を、最初のファイルを含むコミットとして記録します。
+この2ファイルはまだ未追跡です。未追跡ファイルの内容は通常の \cmd{git diff} には表示されないため、\cmd{git status} で対象を確認し、\cmd{git add} の後に \cmd{git diff --staged} でコミット予定の内容を確認します。
+
+\begin{codeblock}
+git status
+git add README.md .gitignore
+git status
+git diff --staged
+git commit -m "Add README and ignore rules"
+git log --oneline
+\end{codeblock}
+
+追跡済みファイルを変更した場合は、\cmd{status} $\rightarrow$ \cmd{diff} $\rightarrow$ \cmd{add} $\rightarrow$ \cmd{status} $\rightarrow$ \cmd{diff --staged} $\rightarrow$ \cmd{commit} $\rightarrow$ \cmd{log} の順に確認します。今回のような未追跡ファイルではステージ前の \cmd{git diff} に内容が出ないため、最初の \cmd{diff} を省いています。\footnote{\href{https://git-scm.com/book/ja/v2/Git-の基本-変更内容のリポジトリへの記録}{Pro Git 2.2「変更内容のリポジトリへの記録」}では、\cmd{git diff} はステージ前の変更、\cmd{git diff --staged} はコミット対象としてステージした変更の確認に使うと説明されています。}
+
+\begin{itemize}
+  \item \cmd{git status}: 現在のブランチ、追跡状態、ステージ状態を表示する
+  \item \cmd{git diff}: まだステージしていない変更の差分を表示する
+  \item \cmd{git add}: 実行時点の内容を、次のコミットに含めるスナップショットとしてインデックスへ記録する
+  \item \cmd{git diff --staged}: コミット予定の差分を確認する
+  \item \cmd{git commit}: ステージした変更を履歴に記録する
+  \item \cmd{git log}: コミット履歴を確認する
+\end{itemize}
+
+\cmd{git add} のあとでファイルを再び編集すると、インデックスには \cmd{git add} 実行時点の内容が残り、その後の編集はワークツリーだけにあります。その編集も次のコミットへ含めるには、もう一度 \cmd{git add} を実行します。
+
+\subsection{もう1つコミットを作る}
+
+\cmd{README.md} に説明を1行追加して保存し、同じ流れを繰り返します。
+
+\begin{codeblock}
+git status
+git diff
+git add README.md
+git status
+git diff --staged
+git commit -m "Explain practice repository"
+git log --oneline --decorate
+\end{codeblock}
+
+新しいコミットは直前のコミットにつながり、直線的な履歴になります。\footnote{\cmd{git add .} は現在位置以下の複数の変更をまとめてステージします。便利ですが、意図しないファイルを含めないよう、先に \cmd{git status} と \cmd{git diff} を確認します。}
+
+これは、少しずつ配置を変えて撮ったコマが順番に並ぶ様子と同じです。各コマが親コミットを参照してつながる履歴に当たり、Git でも作業の節目ごとにコミットすると変更の過程をたどりやすくなります。
+
+\section{【実践】変更を取り消す}
+
+取り消す対象によって操作は異なります。\cmd{restore} は未コミットの内容、\cmd{revert} は履歴を残して打ち消す変更、\cmd{reset} は履歴の先端を操作します。実行前に \cmd{git status} と \cmd{git log --oneline} を確認してください。
+
+\subsection{ワークツリーの未コミット変更を戻す}
+
+\cmd{README.md} を編集したあと、その変更を捨てて最後のコミット時点に戻す場合は次を使います。
+
+\begin{codeblock}
+git diff
+git restore README.md
+git status
+\end{codeblock}
+
+\cmd{git restore README.md} は、ワークツリーの \cmd{README.md} をインデックスの内容へ戻します。まだステージしていなければ、通常はインデックスと直前のコミットの内容が一致しています。
+
+撮影でいえば、動画と撮影済みの写真は変えず、撮影セットだけを写真の配置へ戻す操作です。つまり、インデックスを基準にワークツリーを戻します。
+
+\warning{\cmd{git restore README.md} で捨てた未コミット変更は、通常 Git から復元できません。必要ならコピーを取ってから実行します。}
+
+\subsection{ステージを取り消す}
+
+ファイルの編集内容は残したまま、\cmd{git add} だけを取り消します。
+
+\begin{codeblock}
+git restore --staged README.md
+git status
+\end{codeblock}
+
+\cmd{git restore --staged README.md} は、ワークツリーの編集内容を残したまま、インデックスの \cmd{README.md} を \cmd{HEAD} の内容へ戻します。
+
+撮影では、セットはそのままに、動画へ追加する前の写真だけを破棄する操作に当たります。コミット履歴とワークツリーの編集内容は変わりません。
+
+\subsection{コミットした変更を打ち消す}
+
+すでにコミットした変更、特に GitHub へ共有済みの変更を取り消す場合は、\cmd{git revert} を使います。\cmd{revert} は指定したコミットの変更を逆向きに適用し、その結果を新しいコミットとして記録します。元のコミットを履歴から消さないため、共有された履歴を保ったまま変更を打ち消せます。
+
+ストップモーションなら、人形が一歩進んだコマを削除せず、元の位置へ戻るコマを後から加えます。「進んでから戻った」という経緯も履歴に残ります。
+
+直前のコミットを打ち消す場合は次のようにします。
+
+\begin{codeblock}
+git log --oneline
+git revert HEAD
+git log --oneline
+git status
+\end{codeblock}
+
+コミットメッセージを編集する画面が開いた場合は、内容を確認して保存し、エディタを終了します。直前以外のコミットを指定する場合は、\cmd{git revert COMMIT-ID} のようにコミットIDを指定します。
+
+\subsection{直前のコミットをやり直す}
+
+まだ GitHub に送っていない直前のコミットを取り消し、変更をステージしたまま残す例です。
+
+\cmd{git reset} は、ブランチが指すコミットを過去へ移し、方式に応じてインデックスとワークツリーを更新します。打ち消し用の新しいコミットは作りません。
+
+\Needspace{7\baselineskip}
+動画編集なら、タイムラインの末尾を過去のコマへ移し、それ以降を作品の続きから外す操作に当たります。写真や撮影セットを残すかどうかが、\cmd{reset} のオプションによって変わります。
+
+\begin{codeblock}
+git reset --soft HEAD~1
+git status
+\end{codeblock}
+
+\cmd{--soft} では、ブランチの指すコミットだけを戻し、取り消したコミットの内容をインデックスに残します。
+
+ストップモーションでいえば、タイムラインから外したコマを動画へ戻せる写真として残す状態です。
+
+変更をワークツリーに残し、ステージだけ外す場合は次を使います。
+
+\begin{codeblock}
+git reset HEAD~1
+git status
+\end{codeblock}
+
+引数を付けない \cmd{git reset} では、ブランチの指すコミットを戻してステージを外しますが、ワークツリーの変更は残します。
+
+ストップモーションでいえば、タイムラインから外したコマは破棄しても、撮影セットの配置は残す状態です。
+
+\warning{\cmd{git reset --hard} はコミットと未コミット変更をまとめて失う可能性があります。また、共有済みのコミットに対する \cmd{reset} は他の人の履歴と食い違う原因になります。初心者演習では使いません。共有済みの変更を打ち消すときは、前節の \cmd{git revert} を使います。}
+
+\section{【実践】変更を一時退避する}
+
+\term{stash}とは、作業中の変更をワークツリー外へ一時退避した記録です。別の対応へ切り替えたいとき、\cmd{git stash} で追跡済みファイルの変更を退避できます。
+
+これは、撮影途中の配置を控えてセットを片付け、後で元へ戻す作業に似ています。退避が \cmd{git stash}、復元が \cmd{git stash pop} または \cmd{git stash apply} に当たります。
+
+\begin{codeblock}
+git status
+git stash push -m "WIP: edit README"
+git status
+git stash list
+git stash pop
+git status
+\end{codeblock}
+
+\cmd{stash pop} は退避内容を戻し、正常に適用できれば一覧から削除します。退避を残したまま適用する場合は \cmd{git stash apply} を使います。\footnote{新規作成した未追跡ファイルも退避する場合は \cmd{git stash -u} を使います。stash は長期保存場所ではありません。作業の節目はコミットとして残します。}
+
+\section{【実践】ブランチを使う}
+
+\term{ブランチ}とは、履歴の先端にあるコミットを指す、移動可能な名前付き参照です。コミットを追加すると新しい先端へ進むため、元の履歴を保ちながら作業を分けられます。
+
+ストップモーションでも、同じコマから別の演出を撮れば、コマの並びが分岐します。各系列の末端を示す名前付きの札がブランチに当たります。ブランチ自体は系列全体のコピーではなく、一つのコミットを指します。
+
+\subsection{作成と切り替え}
+
+\begin{codeblock}
+git branch
+git branch add-greeting
+git switch add-greeting
+git branch
+\end{codeblock}
+
+作成と切り替えを一度に行う場合は次のようにします。
+
+\begin{codeblock}
+git switch -c add-greeting
+\end{codeblock}
+
+同名のブランチがすでにある場合は失敗するため、そのときは \cmd{git switch add-greeting} を使います。
+
+\cmd{git switch} は、作業対象とするブランチを切り替え、ワークツリーをそのブランチの状態に合わせます。
+
+撮影では、続きを撮る系列を選び、セットを最後のコマに合わせます。系列の選択がブランチの切り替え、セットの調整がワークツリーの更新に当たります。
+
+ブランチを切り替えたら \cmd{README.md} に挨拶を追加し、コミットします。
+
+\begin{codeblock}
+git status
+git add README.md
+git commit -m "Add greeting"
+git log --oneline --decorate --graph --all
+\end{codeblock}
+
+\subsection{ブランチをマージする}
+
+\cmd{add-greeting} の変更を \cmd{main} に取り込みます。\term{取り込み先へ先に切り替える}ことが重要です。
+
+\begin{codeblock}
+git switch main
+git merge add-greeting
+git log --oneline --decorate --graph --all
+\end{codeblock}
+
+履歴が分岐していなければ、\cmd{main} の位置だけが前へ進む fast-forward になることがあります。双方に別のコミットがある場合は、統合したことを表すマージコミットが作られます。
+
+撮影なら、一方で背景を夜景にし、もう一方で人形の右手を上げた場合、両方を一つの場面へ合わせます。これが、別ブランチの変更を現在のブランチへ取り込む \cmd{git merge} に当たります。
+
+同じ行を別々のブランチで変更すると、Git が自動で選べず\term{コンフリクト}になることがあります。その場合はファイルを開いて残す内容を決め、印を削除してから \cmd{git add} と \cmd{git commit} を行います。マージ自体を中止するなら \cmd{git merge --abort} を使います。
+
+ただし、同じ人形の右手を一方では上げ、もう一方では下げていると、自動では統合できません。この状態がコンフリクトです。制作者が姿勢を決めるように、ファイルの競合箇所を編集し、\cmd{git add} と \cmd{git commit} で結果を記録します。
+
+\section{【実践】GitHubの準備と認証}
+
+本節では、GitHub アカウント作成の要点と、GitHub CLI の認証手順を確認します。
+
+\subsection{GitHubアカウントを作る}
+
+\url{https://github.com/} の \term{Sign up} から個人アカウントを作成します。受信できるメールアドレスと、公開されてもよいユーザー名を用意します。
+
+\begin{enumerate}
+  \item 画面に従ってアカウントを作る
+  \item 届いたメールでメールアドレスを確認する
+  \item 強く固有のパスワードを使い、二要素認証（2FA）またはパスキーを設定する
+  \item 自分のプロフィール画面へログインできることを確認する
+\end{enumerate}
+
+組織から管理アカウントを支給されている場合は、個人アカウントを新規作成せず、組織の案内を優先します。
+
+\subsection{GitHub CLIで認証する}
+
+ブラウザで GitHub にログインしていても、ターミナルの GitHub CLI には別の認証が必要です。
+
+\begin{codeblock}
+gh auth login
+\end{codeblock}
+
+通常の個人利用では、接続先に \term{GitHub.com}、Git のプロトコルに \term{HTTPS}、認証方法にブラウザを使う方法を選びます。表示された一時コードをブラウザ側で入力し、アクセスを許可します。
+
+認証後は次を確認します。
+
+\begin{codeblock}
+gh auth status
+\end{codeblock}
+
+\warning{アクセストークンや認証情報を、ソースコード、スクリーンショット、チャット、コミットに含めないでください。\cmd{gh auth status --show-token} はトークンを表示するため、通常の確認では使いません。}
+
+\section{【実践】GitHubへpushする}
+
+\subsection{GitHub上に空のリポジトリを作る}
+
+GitHub の \term{New repository} から \cmd{git-practice} を作成します。すでに手元にコミットがあるため、README、\cmd{.gitignore}、LICENSE は GitHub 側で追加せず、空のリポジトリにします。
+
+\Needspace{5\baselineskip}
+作成後に表示される HTTPS URL を使います。\cmd{YOUR-NAME} は自分のGitHubユーザー名へ置き換えます。
+
+\begin{codeblock}
+https://github.com/YOUR-NAME/git-practice.git
+\end{codeblock}
+
+\subsection{リモートを設定する}
+
+\begin{codeblock}
+git remote add origin https://github.com/YOUR-NAME/git-practice.git
+git remote -v
+\end{codeblock}
+
+\cmd{origin} はリモートにつける慣例的な短い名前です。特別な機能を持つ予約語ではありません。
+
+\subsection{コミットを送る}
+
+\begin{codeblock}
+git push -u origin main
+\end{codeblock}
+
+\term{push}とは、ローカルブランチのコミットをリモートブランチへ転送する操作です。\cmd{-u} は、\cmd{main} が引数なしで送受信するときの\term{上流ブランチ}を設定します。2 回目以降は、多くの場合 \cmd{git push} だけで送れます。\footnote{\cmd{push} が送るのはコミットです。未コミットの変更は送られません。先に \cmd{git status} と \cmd{git log --oneline} で確認します。}
+
+これは、手元の動画で確定したコマと、そのコマに含まれる素材を共有先へ送る操作に当たります。撮影セットで調整中の配置や、動画へ追加していない写真と素材は送られません。
+
+GitHub のリポジトリページを更新し、README とコミット履歴が表示されることを確認します。
+
+\section{【実践】リモートリポジトリをcloneする}
+
+\cmd{clone} は、リモートリポジトリのファイルと履歴を新しいディレクトリへ複製し、通常は \cmd{origin} も自動設定します。
+
+撮影なら、共有先にある動画とその素材を一式複製し、続きを制作できる手元の撮影セットを用意する操作に当たります。
+
+\subsection{git cloneを使う}
+
+元の \cmd{git-practice} の外に移動してから実行します。
+
+\begin{codeblock}
+cd ..
+git clone https://github.com/YOUR-NAME/git-practice.git git-practice-clone
+cd git-practice-clone
+git remote -v
+git log --oneline
+\end{codeblock}
+
+\subsection{gh repo cloneを使う}
+
+GitHub CLI で認証済みなら、\cmd{OWNER/REPOSITORY} の形式も使えます。
+
+\begin{codeblock}
+cd ..
+gh repo clone YOUR-NAME/git-practice git-practice-gh
+\end{codeblock}
+
+\warning{すでに Git 管理しているディレクトリの中へ、同じリポジトリを重ねて clone しないでください。clone は原則として、そのリポジトリを置きたい親ディレクトリで実行します。}
+
+共同作業では、他の人がリモートへ追加したコミットを \cmd{git pull} で取得・統合します。作業前に \cmd{git pull}、作業後に \cmd{git push} という流れが一例ですが、チームのルールを優先します。
+
+\section{【応用】IssueとPull Request}
+
+\subsection{Issue}
+
+\term{Issue}とは、GitHub 上で問題、提案、質問、完了条件、議論をまとめる記録です。目的、理由、完了条件を書くと、作業の入口になります。
+
+\subsection{Pull Request}
+
+Pull Request（PR）は、あるブランチの変更を別のブランチへ取り込む提案です。差分を基に説明、相談、レビューを行い、合意後にマージします。
+
+同様に、別の撮影系列で作った演出を本編へ採用する提案が Pull Request、統合前の確認が差分レビューに当たります。
+
+小さな共同作業の例は次のとおりです。
+
+\begin{enumerate}
+  \item Issue で目的を確認する
+  \item \cmd{main} から作業ブランチを作る
+  \item 変更し、内容ごとにコミットする
+  \item ブランチを GitHub へ push する
+  \item PR を作り、目的と変更内容、確認方法を書く
+  \item レビューを受け、必要なら追加コミットする
+  \item 承認後に \cmd{main} へマージする
+\end{enumerate}
+
+\begin{codeblock}
+git switch -c fix-typo
+# Edit files, then review the changes.
+git status
+git diff
+git add README.md
+git commit -m "Fix README typo"
+git push -u origin fix-typo
+gh pr create --fill
+\end{codeblock}
+
+\term{コントリビューション}とは、Issue の報告、文書やコードの変更、レビューなどによるプロジェクトへの貢献です。公開プロジェクトでは、README、\cmd{CONTRIBUTING.md}、行動規範、ライセンスを先に確認します。
+
+\section{【応用】Gitの仕組み}
+
+ここからは、基本操作を理解したあとに読む内容です。
+
+\subsection{コミットはスナップショットをつなぐ}
+
+Git はコミット時点のファイル構成をスナップショットとして扱います。各コミットは親コミットを参照し、そのつながりが履歴になります。
+
+\subsection{保存内容から識別子を計算する}
+
+\term{ハッシュ関数}とは、任意長の入力から一定長の値を計算する仕組みです。Git は保存内容から\term{オブジェクト ID}を計算し、保存単位を識別します。
+
+\term{Git オブジェクト}とは、Git 内部の保存単位です。主な種類は、ファイル内容を格納する\term{ブロブ}、ファイル名やディレクトリ構成を記録する\term{ツリー}、スナップショット、作成者、メッセージ、親コミットを記録する\term{コミットオブジェクト}です。
+
+内容が変わればオブジェクト ID も変わります。計算方法を覚える必要はなく、「各コミットには履歴上の住所のような ID がある」と理解すれば十分です。
+
+\begin{codeblock}
+git log --oneline
+git show COMMIT-ID
+\end{codeblock}
+
+ブランチは、履歴の先端にあるコミットを指します。\term{HEAD}は通常、現在チェックアウトしているブランチを指す参照ですが、特定のコミットを直接指す場合もあります。
+
+Git の仕組みをさらに学ぶ読み物として、\href{https://git-scm.com/book/ja/v2}{Pro Git 日本語版}を参照してください。特に第10章「Gitの内側」では、Git オブジェクトや参照の仕組みを詳しく学べます。
+
+\section{まとめと演習チェック}
+
+\begin{itemize}[label=$\square$]
+  \item Git は手元の履歴管理、GitHub は履歴の共有・協働サービスだと説明できる
+  \item ワークツリー、インデックス、ローカルリポジトリの違いを説明できる
+  \item \cmd{status} $\rightarrow$ \cmd{diff} $\rightarrow$ \cmd{add} $\rightarrow$ \cmd{status} $\rightarrow$ \cmd{diff --staged} $\rightarrow$ \cmd{commit} $\rightarrow$ \cmd{log} を実行できる
+  \item \cmd{restore}、\cmd{revert}、\cmd{reset} の対象の違いを確認してから使える
+  \item ブランチを作成・切り替え、\cmd{main} へマージできる
+  \item GitHub CLI の認証状態を確認できる
+  \item リモートを設定し、push と clone ができる
+  \item Issue と Pull Request の役割を説明できる
+\end{itemize}
+
+\Needspace{7\baselineskip}
+困ったときは、すぐに取り消しコマンドを試すのではなく、まず次の情報を確認して共有します。
+
+\begin{codeblock}
+git status
+git log --oneline --decorate --graph --all -10
+git remote -v
+\end{codeblock}
+
+\Needspace{9\baselineskip}
+\section{公式資料}
+
+\begin{itemize}
+  \item Git リファレンス: \url{https://git-scm.com/docs}
+  \item Pro Git「バージョン管理に関して」: \\
+    \url{https://git-scm.com/book/ja/v2/使い始める-バージョン管理に関して}
+  \item Git Cheat Sheet: \url{https://git-scm.com/cheat-sheet.pdf}
+  \item GitHub Docs: \url{https://docs.github.com/ja}
+  \item GitHub CLI Manual: \url{https://cli.github.com/manual/}
+\end{itemize}
+
+\end{document}
