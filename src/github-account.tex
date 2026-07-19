@@ -1,0 +1,304 @@
+\documentclass[a4paper]{jlreq}
+
+\usepackage[haranoaji]{luatexja-preset}
+\usepackage[margin=25truemm,headheight=18pt]{geometry}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+\usepackage{lastpage}
+\usepackage{xcolor}
+\usepackage[
+  backend=biber,
+  style=numeric,
+  sorting=none,
+  defernumbers=true,
+  url=true,
+  doi=false,
+  isbn=false
+]{biblatex}
+\addbibresource{bib/github-account.bib}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!70!black]{hyperref}
+
+\setlength{\headheight}{18pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{GitHub アカウント作成}
+\fancyhead[R]{\thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\DefineVerbatimEnvironment{codeblock}{Verbatim}{
+  fontsize=\small,
+  frame=single,
+  xleftmargin=1.5em,
+  xrightmargin=1.5em
+}
+
+\newcommand{\cmd}[1]{\texttt{#1}}
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\materialtitle}{GitHub アカウント作成手順}
+
+\title{\materialtitle}
+\author{kska6}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section*{この資料の目的}
+
+この資料では、GitHub を初めて使う人に向けて、個人アカウントの作成からログイン後の基本画面の確認までを説明します。
+GitHub の UI は更新によって変わることがありますが、基本の流れは「サインアップ画面を開く」「必要な情報を入力する」「メールアドレスを確認する」「ログイン後の画面を確認する」です。
+
+\section{用意するもの}
+
+アカウント作成の事前準備とは、登録に使用するメールアドレス、ユーザー名、認証方法をあらかじめ用意することです。
+次のものを用意します。
+
+\begin{itemize}
+  \item 受信できるメールアドレス
+  \item GitHub で使用するユーザー名
+  \item 十分に長いパスワード、または Google / Apple アカウントでのサインアップ
+\end{itemize}
+
+ユーザー名は、GitHub 上で自分を識別するための名前です。
+リポジトリやプロフィールの URL にも含まれるため、あとから見ても分かりやすい名前にします。
+パスワードを使用する場合は、他のサービスと使い回さないようにします。
+
+\section{GitHub のトップページを開く}
+
+ブラウザで GitHub を開きます。
+この資料では、主に英語 UI の表記を使用します。
+
+\begin{codeblock}
+https://github.com/
+\end{codeblock}
+
+画面右上の \term{Sign up}、または画面中央の \term{GitHub に登録する} を選択します。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{ref/github-home-signup.png}
+  \caption{GitHub のトップページとサインアップ入口}
+\end{figure}
+
+\section{必要情報を入力する}
+
+アカウント作成とは、サインアップ画面へ必要な情報を入力し、登録を確定する操作です。
+メールアドレス、パスワード、ユーザー名、国または地域を入力します。
+Google または Apple アカウントを使用する選択肢が表示される場合もあります。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{ref/github-signup-form.png}
+  \caption{GitHub のサインアップフォーム}
+\end{figure}
+
+主な入力項目は次のとおりです。
+
+\begin{itemize}
+  \item \term{Email}: GitHub からの確認メールを受け取れるアドレスを入力する
+  \item \term{Password}: 画面の条件を満たす、安全なパスワードを入力する
+  \item \term{Username}: GitHub 上で表示される名前を入力する
+  \item \term{Your Country/Region}: 自分の国または地域を選ぶ
+  \item \term{GitHub Copilot} や案内メール: 希望しない場合はチェックを外す
+\end{itemize}
+
+入力後、\term{Create account} を選択します。
+途中で画像認証や追加確認が表示された場合は、画面の指示に従います。
+
+\section{メールアドレスを確認する}
+
+メールアドレスの確認とは、GitHub から届く確認メールの案内に従い、登録したメールアドレスの確認を完了する操作です。
+作成したアカウントを利用するため、登録したメールアドレスに確認メールが届いたら、この操作を完了します。
+
+メールが届かない場合は、迷惑メールフォルダ、入力したメールアドレス、受信制限を確認します。
+学校や組織のメールアドレスでは、受信制限によって確認メールが届かないことがあります。
+
+\section{ログイン後のダッシュボードを確認する}
+
+ダッシュボードの確認とは、ログイン後の画面で、GitHub の作業を始めるために必要な要素を把握する操作です。
+アカウントを作成してログインすると、作業の起点となるダッシュボードが表示されます。
+画面には、自分のリポジトリ、ホームやフィード、検索欄、作成メニューなどが表示されます。
+
+最初に見る場所は次の 3 つです。
+
+\begin{itemize}
+  \item GitHub ロゴ: ホームに戻る
+  \item 検索欄: リポジトリ、ユーザー、Issue、Pull Request を検索する
+  \item プロフィール画像: 自分のプロフィールや設定を開く
+\end{itemize}
+
+\section{プロフィールを確認する}
+
+右上のプロフィール画像から、自分のプロフィール画面へ移動できます。
+プロフィール画面では、ユーザー名、プロフィール画像、公開リポジトリ、活動履歴などを確認できます。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{ref/github-profile.png}
+  \caption{GitHub のプロフィール画面}
+\end{figure}
+
+プロフィール画面では、次の点を確認します。
+
+\begin{itemize}
+  \item ユーザー名が意図したものになっているか
+  \item プロフィール画像や表示名を設定から変更できること
+  \item Repositories タブから自分のリポジトリ一覧を見られること
+\end{itemize}
+
+\section{作成後にやること}
+
+アカウントを作成したら、次の設定や準備を行います。
+
+\begin{enumerate}
+  \item メールアドレスの確認を完了する
+  \item プロフィールを必要に応じて整える
+  \item 2FA（またはパスキー）を設定してアカウントを保護する
+  \item GitHub CLI を使う場合は \cmd{gh auth login} で認証する
+  \item 練習用のリポジトリを作成する
+\end{enumerate}
+
+2FA（二要素認証）は、パスワードに加えて認証アプリやセキュリティキーで本人確認を行う仕組みです。
+パスキーは、パスワードに代わる認証方法です。
+早めに設定します。
+
+\section{GitHub CLI で認証する}
+
+GitHub CLI は、ターミナルから GitHub を操作するための \cmd{gh} コマンドです。
+ブラウザで GitHub にログインしていても、GitHub CLI では別途認証が必要です。
+また、HTTPS を使用する Git 操作の認証には、GitHub アカウントのパスワードを使用できません。
+GitHub CLI を使用する場合は、次のコマンドで認証します。
+
+\begin{codeblock}
+gh auth login
+\end{codeblock}
+
+ブラウザ認証とは、ブラウザで一時コードを入力し、GitHub CLI からのアクセスを許可する認証方法です。
+選択に迷う場合は、次の設定で進めます。
+
+\begin{itemize}
+  \item 接続先は \term{GitHub.com} を選ぶ
+  \item Git 操作に使うプロトコルは、迷ったら \term{HTTPS} を選ぶ
+  \item 認証方法は、\term{ブラウザ認証}を選ぶ
+\end{itemize}
+
+\subsection{表示される選択肢の例}
+
+\cmd{gh auth login} を実行すると、GitHub CLI のバージョンや環境によって文言は異なりますが、次のような質問が表示されます。
+
+\begin{codeblock}
+? What account do you want to log into?
+> GitHub.com
+  GitHub Enterprise Server
+\end{codeblock}
+
+通常の GitHub を使う場合は \term{GitHub.com} を選びます。
+学校や会社から専用の GitHub Enterprise Server を指定されている場合だけ、そちらを選びます。
+
+\begin{codeblock}
+? What is your preferred protocol for Git operations?
+> HTTPS
+  SSH
+\end{codeblock}
+
+初めて設定する場合は、\term{HTTPS} を選びます。
+SSH は鍵の作成や登録が必要になるため、授業やチームで指定された場合に選びます。
+SSH を選ぶと、既存の SSH 鍵を使用するか、新しい鍵を作成して GitHub に登録するかを確認されることがあります。
+
+\begin{codeblock}
+? Authenticate Git with your GitHub credentials?
+> Yes
+  No
+\end{codeblock}
+
+\term{Yes} を選ぶと、GitHub CLI が Git の \cmd{push} や \cmd{clone} に使用する認証情報も設定します。
+特別な理由がなければ \term{Yes} を選びます。
+
+\begin{codeblock}
+? How would you like to authenticate GitHub CLI?
+> Login with a web browser
+  Paste an authentication token
+\end{codeblock}
+
+初めて認証する場合は、\term{Login with a web browser} を選びます。
+\term{Paste an authentication token} は、あらかじめ作成した個人アクセストークンを貼り付ける方法です。
+トークンの用途と管理方法を理解している場合に選択します。
+
+\term{Login with a web browser} を選ぶと、次のように一時コードが表示されることがあります。
+
+\begin{codeblock}
+! First copy your one-time code: XXXX-XXXX
+Press Enter to open github.com in your browser...
+\end{codeblock}
+
+表示されたコードをコピーし、Enter を押してブラウザを開きます。
+ブラウザの案内に従って GitHub にログインし、コードを入力して GitHub CLI からのアクセスを許可します。
+認証が完了したら、次のコマンドで認証状態を確認します。
+
+\begin{codeblock}
+gh auth status
+\end{codeblock}
+
+認証に成功していれば、\term{github.com} にログインしているアカウントが表示されます。
+現在のリポジトリをブラウザで開くには、次のコマンドを使います。
+
+\begin{codeblock}
+gh browse
+\end{codeblock}
+
+\cmd{gh browse} は、現在のリポジトリに対応する GitHub のページをブラウザで開くコマンドです。
+Git リポジトリ内で実行していない場合や、GitHub 上のリポジトリが設定されていない場合は使用できません。
+
+ログアウトしたい場合は、次のコマンドを使います。
+
+\begin{codeblock}
+gh auth logout
+\end{codeblock}
+
+個人アクセストークンを使用する場合は、ファイルへの保存や画面共有による漏えいに注意します。
+
+\section{学生向け特典（学割）}
+
+学生向け特典（学割）とは、在学状況を証明して申請し、GitHub Pro や \term{GitHub Student Developer Pack} などを利用できるようにする制度です。
+GitHub アカウントを作成したあとに、\term{GitHub Education} から申請できます。
+特典の内容は変更されることがあるため、申請時に公式ページで最新情報を確認します。
+
+主な申請条件は次のとおりです。
+
+\begin{itemize}
+  \item 学位または卒業資格を得られる学校・教育課程に在籍している
+  \item 自分の GitHub 個人アカウントを持っている
+  \item 13 歳以上である
+  \item 学校発行のメールアドレス、学生証、履修表、在学証明書などで在学状況を証明できる
+\end{itemize}
+
+申請は、GitHub にログインした状態で次のページから行います。
+
+\begin{codeblock}
+https://github.com/settings/education/benefits
+\end{codeblock}
+
+画面の \term{Start an application} から必要事項を入力し、在学状況を確認できる資料を提出します。
+学校発行のメールアドレスを求められた場合は、そのアドレスを GitHub アカウントへ追加し、確認を済ませてから申請します。
+
+\section{公式資料}
+
+\nocite{*}
+
+\subsection{GitHub アカウントの作成}
+
+\printbibliography[heading=none,keyword=account]
+
+\subsection{学生向け特典}
+
+\printbibliography[heading=none,keyword=education]
+
+\subsection{GitHub CLI の認証}
+
+\printbibliography[heading=none,keyword=cli]
+
+\end{document}
