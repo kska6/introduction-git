@@ -20,7 +20,8 @@
   sorting=none,
   url=true,
   doi=false,
-  isbn=false
+  isbn=false,
+  defernumbers=true
 ]{biblatex}
 \addbibresource{bib/introduction-git.bib}
 \usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!70!black]{hyperref}
@@ -1191,6 +1192,15 @@ Git の仕組みをさらに学ぶ読み物として、\href{https://git-scm.com
 \section{公式資料}
 
 \nocite{*}
-\printbibliography[heading=none]
+\printbibliography[
+  heading=subbibliography,
+  title={本文中の引用文献},
+  notkeyword=additional
+]
+\printbibliography[
+  heading=subbibliography,
+  title={追加の公式資料},
+  keyword=additional
+]
 
 \end{document}
