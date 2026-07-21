@@ -1,0 +1,7 @@
+{
+  "policy_version": 1,
+  "develop_enabled": true,
+  "allow_admin_develop_direct_push": true,
+  "develop_required_approvals": 1,
+  "release_tag_pattern": "refs/tags/v*"
+}
