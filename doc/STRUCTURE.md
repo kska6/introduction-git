@@ -22,6 +22,12 @@
 └── src/
     ├── github-account.tex
     ├── introduction-git.tex
+    ├── referent-table-basic-shell-commands.md
+    ├── referent-table-basic-shell-commands.sha256
+    ├── referent-table-cli-file-editing.md
+    ├── referent-table-cli-file-editing.sha256
+    ├── referent-table-editor-installation.md
+    ├── referent-table-editor-installation.sha256
     ├── referent-table-git-analogy-candidates.md
     ├── referent-table-git-analogy-candidates.sha256
     └── referent-table-github-account.md
