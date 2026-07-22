@@ -1,7 +1,7 @@
 {
   "policy_version": 3,
   "main_required_approvals": 0,
-  "develop_required_approvals": 1,
+  "develop_required_approvals": 0,
   "develop_enabled": true,
   "release_tag_pattern": "refs/tags/v[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]*"
 }
